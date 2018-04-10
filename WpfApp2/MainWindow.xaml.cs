@@ -51,26 +51,26 @@ namespace WpfApp2
         {
             Dispatcher.BeginInvoke((Action)(() => { messages.Items.Add($"{DateTime.Now}\t{message}"); }));
         }
-        private async void MqttClient_Disconnected(object sender, MqttClientDisconnectedEventArgs e)
+        private  void MqttClient_Disconnected(object sender, MqttClientDisconnectedEventArgs e)
         {
             DisplayMessage("Disconnected");
-            await Task.CompletedTask;
+            
         }
 
-        private async void MqttClient_Connected(object sender, MqttClientConnectedEventArgs e)
+        private  void MqttClient_Connected(object sender, MqttClientConnectedEventArgs e)
         {
             DisplayMessage("Connected");
-            await Task.CompletedTask;
+            
         }
 
-        private async void MqttClient_ApplicationMessageReceived(object sender, MqttApplicationMessageReceivedEventArgs e)
+        private  void MqttClient_ApplicationMessageReceived(object sender, MqttApplicationMessageReceivedEventArgs e)
         {
 
             try
             {
                 var message = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
                 DisplayMessage(message);
-                await Task.CompletedTask;
+                
             }
             catch(Exception ex)
             {
