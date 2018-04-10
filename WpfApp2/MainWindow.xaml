@@ -1,0 +1,56 @@
+﻿<Window x:Class="WpfApp2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="MainWindow" >
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" Content="message clear" Click="Button_MessageClear"  Margin="10"/>
+            <ListBox Name="messages" Grid.Row="1" Margin="10"/>
+        </Grid>
+        <StackPanel Grid.Column="1" Margin="10">
+            <GroupBox Header="Connect / Disconnect" >
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="connect" Width="80" Margin="10" Click="Button_Connect"/>
+                    <Button Content="disconnect" Width="80" Margin="10" Click="Button_Disconnect"/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="MQTT broker on websocket">
+                <StackPanel >
+                    <TextBlock Text="Address" Margin="10,0"/>
+                    <TextBox Name="mqttAddress" Text="ws://broker.hivemq.com:8000/mqtt" Margin="10,0"/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Subscribe / Unsubscribe">
+                <StackPanel Margin="10">
+                    <TextBlock Text="Topic"/>
+                    <TextBox Name="Topic" Text="mitsuruog"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="subscribe" Click="Button_Subscribe" Margin="10"/>
+                        <Button Content="unsubscribe" Click="Button_Unsubscribe" Margin="10"/>
+                        
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Publish">
+                <StackPanel>
+                    <!--<TextBlock Text="Topic"/>
+                    <TextBox Name="publishTopic" Text="mqtttest"/>-->
+                    <TextBlock Text="Message"/>
+                    <TextBox Name="message"/>
+                    <Button Content="publish" Click="Button_Publish"/>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+    </Grid>
+</Window>
