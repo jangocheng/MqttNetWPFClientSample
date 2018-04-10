@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Threading;
 
 namespace WpfApp2
 {
@@ -21,9 +22,11 @@ namespace WpfApp2
             mqttClient.ApplicationMessageReceived += MqttClient_ApplicationMessageReceived;
             mqttClient.Connected += MqttClient_Connected;
             mqttClient.Disconnected += MqttClient_Disconnected;
-            
+
+            WatchDog = new Timer((stateInfo) => { if (!mqttClient.IsConnected) { DisplayMessage("Watchdog reports the client is not connected");WatchDog.Change(Timeout.Infinite, Timeout.Infinite); } });
         }
 
+        private Timer WatchDog;
         private IMqttClientOptions options;
         private IMqttClient mqttClient;
 
@@ -39,6 +42,7 @@ namespace WpfApp2
 
                 var result = await mqttClient.ConnectAsync(options);
                 DisplayMessage(mqttClient.IsConnected ? "Apparently the client is connected" : "WHAT the client isn't connected?");
+                WatchDog.Change(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
             }
             catch(Exception ex)
             {
