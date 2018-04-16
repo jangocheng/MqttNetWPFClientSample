@@ -18,31 +18,31 @@ namespace WpfApp2
         public MainWindow()
         {
             InitializeComponent();
-            mqttClient = new MqttFactory().CreateMqttClient();
+            mqttClient = new MqttFactory().CreateManagedMqttClient();
             mqttClient.ApplicationMessageReceived += MqttClient_ApplicationMessageReceived;
             mqttClient.Connected += MqttClient_Connected;
             mqttClient.Disconnected += MqttClient_Disconnected;
 
-            WatchDog = new Timer((stateInfo) => { if (!mqttClient.IsConnected) { DisplayMessage("Watchdog reports the client is not connected");WatchDog.Change(Timeout.Infinite, Timeout.Infinite); } });
         }
 
-        private Timer WatchDog;
-        private IMqttClientOptions options;
-        private IMqttClient mqttClient;
+        private IManagedMqttClientOptions options;
+        private IManagedMqttClient mqttClient;
 
         private async void Button_Connect(object sender, RoutedEventArgs e)
         {
             try
             {
-                options = new MqttClientOptionsBuilder()
-                            .WithCommunicationTimeout(TimeSpan.FromSeconds(10))     // Default value
-                            .WithKeepAlivePeriod(TimeSpan.FromSeconds(15))          // Default Value
+                options = new ManagedMqttClientOptionsBuilder()
+                    .WithAutoReconnectDelay(TimeSpan.FromSeconds(5))
+                    .WithClientOptions( new MqttClientOptionsBuilder()
+                            .WithCommunicationTimeout(TimeSpan.FromSeconds(5))     // Default value
+                            .WithKeepAlivePeriod(TimeSpan.FromSeconds(7.5))          // Default Value
                             .WithWebSocketServer(mqttAddress.Text)
+                            .Build())
                             .Build();
 
-                var result = await mqttClient.ConnectAsync(options);
-                DisplayMessage(mqttClient.IsConnected ? "Apparently the client is connected" : "WHAT the client isn't connected?");
-                WatchDog.Change(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+                await mqttClient.StartAsync(options);
+                
             }
             catch(Exception ex)
             {
@@ -84,7 +84,8 @@ namespace WpfApp2
  
         private async void Button_Disconnect(object sender, RoutedEventArgs e)
         {
-            await mqttClient.DisconnectAsync();
+            await mqttClient.StopAsync();
+            DisplayMessage("Client Stopped");
         }
         private async void Button_Subscribe(object sender, RoutedEventArgs e)
         {
@@ -94,8 +95,7 @@ namespace WpfApp2
                 if (mqttClient.IsConnected)
                 {
                     DisplayMessage("Subscribing");
-                    var result = await mqttClient.SubscribeAsync(new TopicFilterBuilder().WithTopic(Topic.Text).Build());
-                    DisplayMessage($"Subscribe result: {result.SingleOrDefault()?.ReturnCode.ToString()}");
+                    await mqttClient.SubscribeAsync(new TopicFilterBuilder().WithTopic(Topic.Text).Build());                    
                 }
                 else
                     DisplayMessage("Client is not connected");
